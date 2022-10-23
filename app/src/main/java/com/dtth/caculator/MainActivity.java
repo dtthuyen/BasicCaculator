@@ -3,9 +3,10 @@ package com.dtth.caculator;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.os.Bundle;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -88,7 +89,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             case R.id.phantram:
                 if (str.charAt(str.length()-1) <= '9' && str.charAt(str.length()-1) >= '0')
                     editText.setText(str + "%");
-                else if (str.charAt(str.length()-1) <= '.')
+                else if (str.charAt(str.length()-1) == '.')
                     editText.setText(str + "0%");
                 break;
             case R.id.dot:
@@ -103,21 +104,22 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             case R.id.minus:
             case R.id.multiply:
             case R.id.divide:
-                if (str.charAt((str.length() - 1)) == ' ')
+                if(str.length() == 0) editText.setText("0 " + ((Button) v).getText() + " ");
+                else if (str.charAt((str.length() - 1)) == ' ')
                     editText.setText(str.substring(0, str.length() - 3) + " " + ((Button) v).getText() + " ");
                 else editText.setText(str + " " + ((Button) v).getText() + " ");
 
                 break;
             case R.id.del:
                 if (str.length() == 1) editText.setText("0");
-                else editText.setText(str.substring(0, str.length() - 1));
+                else editText.setText(str.substring(0, str.trim().length() - 1).trim());
 
                 break;
             case R.id.clear:
                 editText.setText("0");
                 break;
             case R.id.equal:
-                caculate();
+                calculate();
 
                 break;
             default:
@@ -125,7 +127,20 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
     }
 
-    private void caculate() {
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.option_menu,menu);
+        MenuItem item = menu.findItem(R.id.item);
+        item.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem item) {
+                return false;
+            }
+        });
+        return super.onCreateOptionsMenu(menu);
+    }
+
+    private void calculate() {
         double result = 0;
         String str = editText.getText().toString();
         if(!str.contains(" ")) {
@@ -152,17 +167,17 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         result = 0;
                         Toast.makeText(MainActivity.this, "Error", Toast.LENGTH_SHORT).show();
                     } else result = d1 / d2;
-                }
+                } else result = d1;
 
                 double temp = result - (int) result;
                 if (temp > 0) {
                     String last = String.valueOf(result);
                     editText.setText(last);
                 } else {
-                    if(result > 999999999999999d){
+                    if(result > 999999999999999d) {
                         editText.setText("999999999999999d");
-                        Toast.makeText(MainActivity.this,"Over the field",Toast.LENGTH_SHORT).show();
-                    }else {
+                        Toast.makeText(MainActivity.this,"The result is too large",Toast.LENGTH_SHORT).show();
+                    } else {
                         String last = String.valueOf((int) result);
                         editText.setText(last);
                     }
